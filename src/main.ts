@@ -25,36 +25,7 @@ const vuetify = createVuetify({
   },
   theme: {
     defaultTheme: 'dark',
-    themes: {
-      light: {
-        dark: false,
-        colors: {
-          // background: '#3960ad',
-          // container: '#2c61a3',
-          // mainCard: '#28558f',
-          // card: '#5580e3',
-        },
-      },
-    },
   },
-  // theme: {
-  //   defaultTheme: 'light',
-  //   themes: {
-  //     light: {
-  //       dark: false,
-  //       colors: {
-  //         background: '#326ab5',
-  //         container: '#2c61a3',
-  //         // card: '#255997',
-  //         // card: '#5580e2',
-  //         mainCard: '#28558f',
-  //         card: '#5580e3',
-  //         // card: 'rgba(255, 255, 255, 0.05)',
-  //         primary: '#1976D2',
-  //       },
-  //     },
-  //   },
-  // },
   icons: {
     defaultSet: 'mdi',
     aliases,
