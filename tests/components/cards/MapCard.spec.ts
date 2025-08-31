@@ -34,23 +34,7 @@ describe('MapCard', () => {
       expect(screen.queryByText('No data available')).not.toBeInTheDocument();
 
       // The actual l-map component doesn't render in jsdom test environment
-      expect(screen.getByText('OpenStreetMap')).toBeVisible();
-    });
-
-    it('renders attribution with copyright link', () => {
-      setupComponent(MapCard, {
-        piniaOptions: { initialState: { geolocation: { location: MOCK_GEOLOCATION_DATA } } },
-      });
-
-      const attributionChip = screen.getByTestId('map-attribution');
-      expect(attributionChip).toBeVisible();
-      expect(attributionChip).toHaveTextContent('© OpenStreetMap contributors');
-
-      const osmLink = screen.getByRole('link', { name: 'OpenStreetMap' });
-      expect(osmLink).toBeVisible();
-      expect(osmLink).toHaveAttribute('href', 'https://www.openstreetmap.org/copyright');
-      expect(osmLink).toHaveAttribute('target', '_blank');
-      expect(osmLink).toHaveAttribute('rel', 'noopener');
+      expect(screen.getByTestId('map-wrapper')).toBeVisible();
     });
   });
 });

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet';
+import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -20,6 +20,8 @@ L.Icon.Default.mergeOptions({
 
 const zoom = ref(14);
 const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const attribution =
+  '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 const geoStore = useGeolocationStore();
 const { loading, location } = storeToRefs(geoStore);
@@ -39,45 +41,30 @@ const mapRef = ref<InstanceType<typeof LMap>>();
       <NoDataContentText />
     </template>
 
-    <div v-else>
-      <v-lazy :inert="true">
+    <div v-else data-testid="map-wrapper">
+      <v-lazy>
         <l-map
           ref="mapRef"
           :center="[lat, lng]"
           :zoom="zoom"
           :use-global-leaflet="false"
           style="min-height: 400px; height: 100%; width: 100%"
-          :options="{ zoomControl: false }"
+          :options="{
+            zoomControl: false,
+            attributionControl: true,
+            dragging: false,
+            touchZoom: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+          }"
           data-testid="map-container"
         >
-          <l-tile-layer :url="tileUrl" />
-          <l-marker :lat-lng="[lat, lng]">
-            <l-popup />
-          </l-marker>
+          <l-tile-layer :url="tileUrl" :attribution="attribution" />
+          <l-marker :lat-lng="[lat, lng]" />
         </l-map>
       </v-lazy>
-      <v-chip
-        size="x-small"
-        variant="flat"
-        class="position-absolute"
-        color="grey-darken-3"
-        rounded="pill"
-        style="bottom: 5px; right: 5px; z-index: 1000"
-        data-testid="map-attribution"
-      >
-        <span class="text-caption">
-          ©
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noopener"
-            class="text-decoration-none"
-          >
-            OpenStreetMap
-          </a>
-          contributors
-        </span>
-      </v-chip>
     </div>
   </v-card>
 </template>
