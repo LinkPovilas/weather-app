@@ -1,9 +1,18 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+export const MESSAGE_COLOR_TYPE = {
+  ERROR: 'error',
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  INFO: 'info',
+} as const;
+
+export type MessageColorType = (typeof MESSAGE_COLOR_TYPE)[keyof typeof MESSAGE_COLOR_TYPE];
+
 export type Message = {
   text: string;
-  color: 'error' | 'success' | 'warning' | 'info' | string;
+  color: MessageColorType;
 };
 
 export const useMessagesStore = defineStore('messages', () => {
@@ -14,19 +23,19 @@ export const useMessagesStore = defineStore('messages', () => {
   };
 
   const addError = (text: string) => {
-    add({ text, color: 'error' });
+    add({ text, color: MESSAGE_COLOR_TYPE.ERROR });
   };
 
   const addSuccess = (text: string) => {
-    add({ text, color: 'success' });
+    add({ text, color: MESSAGE_COLOR_TYPE.SUCCESS });
   };
 
   const addWarning = (text: string) => {
-    add({ text, color: 'warning' });
+    add({ text, color: MESSAGE_COLOR_TYPE.WARNING });
   };
 
   const addInfo = (text: string) => {
-    add({ text, color: 'info' });
+    add({ text, color: MESSAGE_COLOR_TYPE.INFO });
   };
 
   return {

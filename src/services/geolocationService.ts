@@ -13,7 +13,7 @@ export const OPEN_METEO_GEOLOCATION_API_URL = `${import.meta.env.VITE_OPEN_METEO
 export const fetchGeolocationByIpAddress = async () => {
   const response = await axios.get<IpInfoGeolocationResponse>(IP_INFO_GEOLOCATION_API_URL);
   if (response.status !== HttpStatusCode.Ok) {
-    throw new Error(`Failed to get city from ip address: ${response.status}`);
+    throw new Error(`Failed to get city from ip address. Response status: ${response.status}`);
   }
 
   if (!response.data) {
@@ -50,7 +50,7 @@ export const fetchGeolocationByCoordinates = async (latitude: number, longitude:
   );
 
   if (response.status !== HttpStatusCode.Ok) {
-    throw new Error(`Failed to get city from coordinates: ${response.status}`);
+    throw new Error(`Failed to get city from coordinates. Response status: ${response.status}`);
   }
 
   const data = response.data;
@@ -77,7 +77,7 @@ export const fetchGeolocationByQuery = async (query: string) => {
     params,
   });
   if (response.status !== HttpStatusCode.Ok) {
-    throw new Error(`Failed to get geo location by city: ${response.status}`);
+    throw new Error(`Failed to get geo location by city. Response status: ${response.status}`);
   }
 
   if (!response.data || !response.data.results) {

@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
-import { storeToRefs } from 'pinia';
 import { useDate } from 'vuetify';
-import dayjs from 'dayjs';
 import LoadingSpinner from '../CircularProgressBar.vue';
 import NoDataContentText from './NoDataContentText.vue';
+import dayjs from 'dayjs';
+import { computed } from 'vue';
 
 const weatherStore = useWeatherForecastStore();
-const { loading, dailyForecast } = storeToRefs(weatherStore);
 const date = useDate();
 
 const timeRange = { midnight: 0, nextDay: 86400 };
@@ -23,22 +22,26 @@ const formatDaylightDuration = (durationInSeconds: number) => {
   const minutes = Math.floor((durationInSeconds % 3600) / 60);
   return `${hours}h ${minutes}m`;
 };
+
+const isDailyForecastEmpty = computed(
+  () => !weatherStore.dailyForecast || weatherStore.dailyForecast.length === 0,
+);
 </script>
 
 <template>
   <v-card class="fill-height d-flex flex-column">
-    <LoadingSpinner v-if="loading" />
+    <LoadingSpinner v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Daily Sunrise & Sunset</v-card-title>
 
-      <template v-if="!dailyForecast || dailyForecast.length === 0">
+      <template v-if="isDailyForecastEmpty">
         <NoDataContentText />
       </template>
 
       <v-list v-else class="flex-grow-1 d-flex flex-column justify-space-around">
         <v-list-item
-          v-for="daily in dailyForecast"
+          v-for="daily in weatherStore.dailyForecast"
           :key="daily.time"
           class="justify-space-around align-center"
           data-testid="daily-sunrise-sunset-item"

@@ -43,7 +43,7 @@ describe('geolocationService', () => {
       });
 
       await expect(fetchGeolocationByIpAddress()).rejects.toThrow(
-        'Failed to get city from ip address: 400',
+        'Failed to get city from ip address. Response status: 400',
       );
     });
 
@@ -106,7 +106,7 @@ describe('geolocationService', () => {
       });
 
       await expect(fetchGeolocationByCoordinates(latitude, longitude)).rejects.toThrow(
-        'Failed to get city from coordinates: 400',
+        'Failed to get city from coordinates. Response status: 400',
       );
     });
 
@@ -147,7 +147,7 @@ describe('geolocationService', () => {
       });
 
       await expect(fetchGeolocationByQuery('Amsterdam')).rejects.toThrow(
-        'Failed to get geo location by city: 400',
+        'Failed to get geo location by city. Response status: 400',
       );
     });
 

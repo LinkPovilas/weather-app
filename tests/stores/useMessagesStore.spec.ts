@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from 'pinia';
-import { useMessagesStore } from '../../src/stores/useMessagesStore';
+import { MESSAGE_COLOR_TYPE, useMessagesStore } from '../../src/stores/useMessagesStore';
 
 describe('useMessagesStore', () => {
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('useMessagesStore', () => {
   it('should add custom message to queue', () => {
     const messagesStore = useMessagesStore();
     const spy = vi.spyOn(messagesStore, 'add');
-    const message = { text: 'test', color: 'custom' };
+    const message = { text: 'test', color: MESSAGE_COLOR_TYPE.INFO };
 
     messagesStore.add(message);
 

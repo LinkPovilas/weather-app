@@ -1,47 +1,48 @@
 <script setup lang="ts">
 import { useGeolocationStore } from '@/stores/useGeolocationStore';
-import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 
 const searchText = ref('');
 
 const geolocationStore = useGeolocationStore();
-const { loading, isGeolocationSupported, geolocationPermission } = storeToRefs(geolocationStore);
+import { useDebounceFn } from '@vueuse/core';
 
-const mapMarkerConfig = computed(() => {
-  if (!isGeolocationSupported.value) {
-    return {
-      icon: 'mdi-map-marker-off',
-      color: 'grey-darken-1',
-      tooltip: 'Geolocation is not supported in your browser',
-    };
-  }
-
-  const permission = geolocationPermission.value;
-
-  if (permission === 'granted') {
-    return { icon: 'mdi-map-marker', color: 'primary', tooltip: 'Use my current location' };
-  }
-
-  if (permission === 'prompt') {
-    return {
-      icon: 'mdi-map-marker-question',
-      color: 'amber-darken-2',
-      tooltip: 'Allow location access',
-    };
-  }
-
-  return {
+const MAP_MARKER_CONFIGS = {
+  UNSUPPORTED: {
+    icon: 'mdi-map-marker-off',
+    color: 'grey-darken-1',
+    tooltip: 'Geolocation is not supported in your browser',
+  },
+  GRANTED: { icon: 'mdi-map-marker', color: 'primary', tooltip: 'Use my current location' },
+  PROMPT: {
+    icon: 'mdi-map-marker-question',
+    color: 'amber-darken-2',
+    tooltip: 'Allow location access',
+  },
+  DENIED: {
     icon: 'mdi-map-marker-remove',
     color: 'error',
     tooltip: 'Location denied. Allow in browser settings.',
-  };
+  },
+};
+
+const mapMarkerConfig = computed(() => {
+  if (!geolocationStore.isGeolocationSupported) {
+    return MAP_MARKER_CONFIGS.UNSUPPORTED;
+  }
+
+  const permission = geolocationStore.geolocationPermission;
+  return (
+    MAP_MARKER_CONFIGS[permission?.toUpperCase() as keyof typeof MAP_MARKER_CONFIGS] ||
+    MAP_MARKER_CONFIGS.DENIED
+  );
 });
 
 const LETTERS_SPACES = /^[A-Za-z\s]*$/;
 
 const rules = {
-  lettersAndSpaces: (v: string) => LETTERS_SPACES.test(v) || 'Only letters and spaces are allowed',
+  lettersAndSpaces: (text: string) =>
+    LETTERS_SPACES.test(text) || 'Only letters and spaces are allowed',
 };
 
 const allowOnlyLetters = (event: KeyboardEvent) => {
@@ -54,26 +55,37 @@ const onClear = () => {
   searchText.value = '';
 };
 
-const onUseMyLocation = () => {
-  if (!isGeolocationSupported.value || geolocationPermission.value === 'denied') {
+const fetchUserLocation = useDebounceFn(async () => {
+  await geolocationStore.fetchUserLocation();
+}, 500);
+
+const onUseMyLocation = async () => {
+  if (
+    !geolocationStore.isGeolocationSupported ||
+    geolocationStore.geolocationPermission === 'denied'
+  ) {
     return;
   }
 
-  geolocationStore.fetchUserLocation();
+  await fetchUserLocation();
   onClear();
 };
+
+const searchForLocation = useDebounceFn(async () => {
+  await geolocationStore.searchLocation(searchText.value);
+}, 500);
 
 const onSearch = async () => {
   if (!searchText.value.trim() || !LETTERS_SPACES.test(searchText.value)) {
     return;
   }
-  await geolocationStore.searchLocation(searchText.value);
+  await searchForLocation();
 };
 </script>
 
 <template>
   <v-text-field
-    :loading="loading"
+    :loading="geolocationStore.loading"
     :rules="[rules.lettersAndSpaces]"
     prepend-inner-icon="mdi-magnify"
     label="Search for a location"

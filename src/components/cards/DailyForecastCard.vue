@@ -1,31 +1,34 @@
 <script setup lang="ts">
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { Icon } from '@iconify/vue';
-import { storeToRefs } from 'pinia';
 import { useDate } from 'vuetify';
 import LoadingSpinner from '../CircularProgressBar.vue';
 import { getWeatherDescription, getWeatherIcon } from '@/utils/weatherUtils';
 import NoDataContentText from './NoDataContentText.vue';
+import { computed } from 'vue';
 
 const weatherStore = useWeatherForecastStore();
-const { loading, dailyForecast } = storeToRefs(weatherStore);
 
 const date = useDate();
+
+const isDailyForecastEmpty = computed(
+  () => !weatherStore.dailyForecast || weatherStore.dailyForecast.length === 0,
+);
 </script>
 
 <template>
   <v-card class="fill-height">
-    <LoadingSpinner v-if="loading" />
+    <LoadingSpinner v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Daily Forecast</v-card-title>
 
-      <template v-if="!dailyForecast || dailyForecast.length === 0">
+      <template v-if="isDailyForecastEmpty">
         <NoDataContentText />
       </template>
 
       <v-list v-else bg-color="transparent" data-testid="daily-forecast-list">
-        <template v-for="(daily, index) in dailyForecast" :key="index">
+        <template v-for="(daily, index) in weatherStore.dailyForecast" :key="index">
           <v-divider v-if="index > 0" data-testid="forecast-divider" />
 
           <v-list-item>
