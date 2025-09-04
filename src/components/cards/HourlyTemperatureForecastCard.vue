@@ -2,14 +2,12 @@
 import { VisXYContainer, VisArea, VisScatter, VisAxis } from '@unovis/vue';
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { computed } from 'vue';
-import { storeToRefs } from 'pinia';
 import { isSameHour } from '@/utils/timeUtils';
 import { useDate } from 'vuetify';
 import CircularProgressBar from '../CircularProgressBar.vue';
 import NoDataContentText from './NoDataContentText.vue';
 
 const weatherStore = useWeatherForecastStore();
-const { loading, hourlyForecast, currentWeather } = storeToRefs(weatherStore);
 
 const date = useDate();
 
@@ -21,21 +19,23 @@ type ChartData = {
 };
 
 const nowPoint = computed(() => {
-  const currentTime = currentWeather.value?.time || new Date().toISOString();
-  return hourlyForecast.value?.find((item) => item && isSameHour(item.time, currentTime));
+  const currentTime = weatherStore.currentWeather?.time || new Date().toISOString();
+  return weatherStore.hourlyForecast?.find((item) => item && isSameHour(item.time, currentTime));
 });
 
+const hourlyForecast = computed(() => weatherStore.hourlyForecast || []);
+
 const chartData = computed<ChartData[]>(() => {
-  const data = hourlyForecast.value || [];
+  const currentNowPoint = nowPoint.value;
 
   const nowPointIndex =
-    nowPoint.value && data.length > 0
-      ? data.findIndex((item) => isSameHour(item.time, nowPoint.value!.time))
+    currentNowPoint && hourlyForecast.value.length > 0
+      ? hourlyForecast.value.findIndex((item) => isSameHour(item.time, currentNowPoint.time))
       : 0;
 
   const startIndex = Math.max(0, nowPointIndex - 1);
-  const endIndex = Math.min(data.length, startIndex + 9);
-  const result = data.slice(startIndex, endIndex);
+  const endIndex = Math.min(hourlyForecast.value.length, startIndex + 9);
+  const result = hourlyForecast.value.slice(startIndex, endIndex);
 
   return result.map((item, index) => ({
     index,
@@ -56,7 +56,8 @@ const tickFormat = (value: number): string => {
     return '';
   }
 
-  if (nowPoint.value && isSameHour(dataPoint.time, nowPoint.value.time)) {
+  const currentNowPoint = nowPoint.value;
+  if (currentNowPoint && isSameHour(dataPoint.time, currentNowPoint.time)) {
     return 'Now';
   }
   return date.format(dataPoint.time, 'fullTime24h');
@@ -68,11 +69,15 @@ const y = (d: ChartData) => d.temperature;
 const temperatureEveryTwoHours = (d: ChartData, i: number): string => {
   return i % 2 === 0 ? `${d.temperature}°` : '';
 };
+
+const isHourlyForecastEmpty = computed(
+  () => !weatherStore.hourlyForecast || weatherStore.hourlyForecast.length === 0,
+);
 </script>
 
 <template>
   <v-card class="fill-height">
-    <CircularProgressBar v-if="loading" />
+    <CircularProgressBar v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Hourly Temperature Forecast</v-card-title>
@@ -87,7 +92,7 @@ const temperatureEveryTwoHours = (d: ChartData, i: number): string => {
         </defs>
       </svg>
 
-      <template v-if="!hourlyForecast || hourlyForecast.length === 0">
+      <template v-if="isHourlyForecastEmpty">
         <NoDataContentText />
       </template>
 
@@ -96,7 +101,7 @@ const temperatureEveryTwoHours = (d: ChartData, i: number): string => {
           class="d-flex justify-center align-center fill-height"
           data-testid="hourly-temperature-forecast-chart"
         >
-          <VisXYContainer v-if="chartData.length > 0" :data="chartData" :margin="{ bottom: 20 }">
+          <VisXYContainer v-if="chartData.length" :data="chartData" :margin="{ bottom: 20 }">
             <VisArea
               curveType="basis"
               :x="x"

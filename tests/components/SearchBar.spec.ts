@@ -8,6 +8,7 @@ import { mockGeolocation, mockPermission } from '../mocks/useGeolocationStore.mo
 vi.mock('@vueuse/core', () => ({
   useGeolocation: vi.fn(),
   usePermission: vi.fn(),
+  useDebounceFn: vi.fn((fn) => fn),
 }));
 
 describe('SearchBar', () => {

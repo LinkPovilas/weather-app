@@ -40,29 +40,35 @@ export type WeatherForecastData = {
   hourly: HourlyForecast[];
 };
 
+type CurrentWeatherForecast = {
+  time: string;
+  weather_code: number;
+  temperature_2m: number;
+  apparent_temperature: number;
+  surface_pressure: number;
+  precipitation: number;
+  wind_speed_10m: number;
+  relative_humidity_2m: number;
+};
+
+type DailyWeatherForecast = {
+  time: string[];
+  weather_code: number[];
+  temperature_2m_min: number[];
+  temperature_2m_max: number[];
+  sunrise: string[];
+  sunset: string[];
+  daylight_duration: number[];
+};
+
+type HourlyWeatherForecast = {
+  time: string[];
+  temperature_2m: number[];
+  precipitation_probability: number[];
+};
+
 export type OpenMeteoWeatherForecastResponse = {
-  current: {
-    time: string;
-    weather_code: number;
-    temperature_2m: number;
-    apparent_temperature: number;
-    surface_pressure: number;
-    precipitation: number;
-    wind_speed_10m: number;
-    relative_humidity_2m: number;
-  };
-  daily: {
-    time: string[];
-    weather_code: number[];
-    temperature_2m_min: number[];
-    temperature_2m_max: number[];
-    sunrise: string[];
-    sunset: string[];
-    daylight_duration: number[];
-  };
-  hourly: {
-    time: string[];
-    temperature_2m: number[];
-    precipitation_probability: number[];
-  };
+  current: CurrentWeatherForecast;
+  daily: DailyWeatherForecast;
+  hourly: HourlyWeatherForecast;
 };

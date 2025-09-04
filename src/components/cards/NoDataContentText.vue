@@ -3,7 +3,7 @@ type Props = {
   message?: string;
 };
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   message: 'No data available',
 });
 </script>
@@ -14,6 +14,6 @@ const props = withDefaults(defineProps<Props>(), {
     data-testid="no-data-content-text"
   >
     <v-icon icon="mdi-information-outline" size="large" data-testid="no-data-content-text-icon" />
-    <p class="ml-1">{{ props.message }}</p>
+    <p class="ml-1">{{ message }}</p>
   </v-card-text>
 </template>

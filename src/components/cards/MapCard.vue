@@ -8,7 +8,6 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useGeolocationStore } from '@/stores/useGeolocationStore';
-import { storeToRefs } from 'pinia';
 import LoadingSpinner from '../CircularProgressBar.vue';
 import NoDataContentText from './NoDataContentText.vue';
 
@@ -24,20 +23,30 @@ const attribution =
   '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 const geoStore = useGeolocationStore();
-const { loading, location } = storeToRefs(geoStore);
 
-const lat = computed(() => location.value.latitude ?? 0);
-const lng = computed(() => location.value.longitude ?? 0);
+const lat = computed(() => geoStore.location.latitude ?? 0);
+const lng = computed(() => geoStore.location.longitude ?? 0);
 const mapRef = ref<InstanceType<typeof LMap>>();
+
+const mapConfig = {
+  zoomControl: false,
+  attributionControl: true,
+  dragging: false,
+  touchZoom: false,
+  scrollWheelZoom: false,
+  doubleClickZoom: false,
+  boxZoom: false,
+  keyboard: false,
+};
 </script>
 
 <template>
   <v-card class="fill-height">
-    <template v-if="loading">
+    <template v-if="geoStore.loading">
       <LoadingSpinner />
     </template>
 
-    <template v-else-if="!location">
+    <template v-else-if="!geoStore.location">
       <NoDataContentText />
     </template>
 
@@ -49,16 +58,7 @@ const mapRef = ref<InstanceType<typeof LMap>>();
           :zoom="zoom"
           :use-global-leaflet="false"
           style="min-height: 400px; height: 100%; width: 100%"
-          :options="{
-            zoomControl: false,
-            attributionControl: true,
-            dragging: false,
-            touchZoom: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            boxZoom: false,
-            keyboard: false,
-          }"
+          :options="mapConfig"
           data-testid="map-container"
         >
           <l-tile-layer :url="tileUrl" :attribution="attribution" />
