@@ -20,7 +20,7 @@ watch(
       weatherStore.fetchWeather(newLocation.latitude, newLocation.longitude);
     }
   },
-  { deep: true },
+  { immediate: true, deep: true },
 );
 
 onMounted(() => {
