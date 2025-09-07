@@ -17,7 +17,7 @@ const date = useDate();
     <template v-else>
       <v-card-title>Daily Forecast</v-card-title>
 
-      <template v-if="weatherStore.dailyForecast?.length === 0">
+      <template v-if="!weatherStore.dailyForecast?.length">
         <no-data-content-text />
       </template>
 
