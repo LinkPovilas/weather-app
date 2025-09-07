@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useGeolocationStore } from '@/stores/useGeolocationStore';
 import { computed, ref } from 'vue';
-
-const searchText = ref('');
-
-const geolocationStore = useGeolocationStore();
 import { useDebounceFn } from '@vueuse/core';
+
+const LETTERS_SPACES = /^[A-Za-z\s]*$/;
+const rules = {
+  lettersAndSpaces: (text: string) =>
+    LETTERS_SPACES.test(text) || 'Only letters and spaces are allowed',
+};
 
 const MAP_MARKER_CONFIGS = {
   UNSUPPORTED: {
@@ -26,32 +28,29 @@ const MAP_MARKER_CONFIGS = {
   },
 };
 
+const geolocationStore = useGeolocationStore();
+
+const searchText = ref('');
+
 const mapMarkerConfig = computed(() => {
-  if (!geolocationStore.isGeolocationSupported) {
-    return MAP_MARKER_CONFIGS.UNSUPPORTED;
+  if (geolocationStore.isGeolocationSupported) {
+    return (
+      MAP_MARKER_CONFIGS[
+        geolocationStore.geolocationPermission?.toUpperCase() as keyof typeof MAP_MARKER_CONFIGS
+      ] || MAP_MARKER_CONFIGS.DENIED
+    );
   }
 
-  const permission = geolocationStore.geolocationPermission;
-  return (
-    MAP_MARKER_CONFIGS[permission?.toUpperCase() as keyof typeof MAP_MARKER_CONFIGS] ||
-    MAP_MARKER_CONFIGS.DENIED
-  );
+  return MAP_MARKER_CONFIGS.UNSUPPORTED;
 });
 
-const LETTERS_SPACES = /^[A-Za-z\s]*$/;
-
-const rules = {
-  lettersAndSpaces: (text: string) =>
-    LETTERS_SPACES.test(text) || 'Only letters and spaces are allowed',
-};
-
-const allowOnlyLetters = (event: KeyboardEvent) => {
+const handleTextInput = (event: KeyboardEvent) => {
   if (!LETTERS_SPACES.test(event.key)) {
     event.preventDefault();
   }
 };
 
-const onClear = () => {
+const handleClear = () => {
   searchText.value = '';
 };
 
@@ -59,7 +58,7 @@ const fetchUserLocation = useDebounceFn(async () => {
   await geolocationStore.fetchUserLocation();
 }, 500);
 
-const onUseMyLocation = async () => {
+const handleLocationSelect = async () => {
   if (
     !geolocationStore.isGeolocationSupported ||
     geolocationStore.geolocationPermission === 'denied'
@@ -68,14 +67,14 @@ const onUseMyLocation = async () => {
   }
 
   await fetchUserLocation();
-  onClear();
+  handleClear();
 };
 
 const searchForLocation = useDebounceFn(async () => {
   await geolocationStore.searchLocation(searchText.value);
 }, 500);
 
-const onSearch = async () => {
+const handleSearch = async () => {
   if (!searchText.value.trim() || !LETTERS_SPACES.test(searchText.value)) {
     return;
   }
@@ -91,9 +90,9 @@ const onSearch = async () => {
     label="Search for a location"
     clear-icon="mdi-close-circle"
     v-model="searchText"
-    @click:clear="onClear"
-    @keydown.enter="onSearch"
-    @keypress="allowOnlyLetters"
+    @click:clear="handleClear"
+    @keydown.enter="handleSearch"
+    @keypress="handleTextInput"
     variant="solo"
     density="compact"
     single-line
@@ -107,7 +106,7 @@ const onSearch = async () => {
             :aria-label="mapMarkerConfig.tooltip"
             :icon="mapMarkerConfig.icon"
             :color="mapMarkerConfig.color"
-            @click="onUseMyLocation"
+            @click="handleLocationSelect"
           />
         </template>
         {{ mapMarkerConfig.tooltip }}

@@ -2,18 +2,18 @@
 import { useGeolocationStore } from '@/stores/useGeolocationStore';
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { Icon } from '@iconify/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useDate } from 'vuetify';
-import CircularProgressBar from '../CircularProgressBar.vue';
+import CircularProgressBar from '@/components/CircularProgressBar.vue';
 import { getWeatherDescription, getWeatherIcon } from '@/utils/weatherUtils';
 import { toKebabCase } from 'vuetify/lib/util/helpers.mjs';
-import NoDataContentText from './NoDataContentText.vue';
+import NoDataContentText from '@/components/cards/NoDataContentText.vue';
 
 const weatherStore = useWeatherForecastStore();
 const geolocationStore = useGeolocationStore();
 const date = useDate();
 
-const getCurrentTime = () => date.format(new Date(), 'fullDateTime24h');
+const getCurrentTime = ref(() => date.format(new Date(), 'fullDateTime24h'));
 
 const weatherMetrics = computed(() => [
   {
@@ -41,7 +41,7 @@ const weatherMetrics = computed(() => [
 
 <template>
   <v-card class="fill-height d-flex flex-column">
-    <CircularProgressBar v-if="weatherStore.loading" />
+    <circular-progress-bar v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title class="d-flex justify-space-between align-center">
@@ -58,14 +58,14 @@ const weatherMetrics = computed(() => [
       }}</v-card-subtitle>
 
       <template v-if="!weatherStore.currentWeather">
-        <NoDataContentText />
+        <no-data-content-text />
       </template>
 
       <template v-else>
         <v-card-text class="flex-grow-1 d-flex align-center">
           <v-row class="d-flex text-center">
             <v-col cols="12" class="d-flex justify-center align-center">
-              <Icon
+              <icon
                 :icon="getWeatherIcon(weatherStore.currentWeather.weatherCode)"
                 class="text-h1"
                 data-testid="current-weather-icon"
@@ -92,7 +92,7 @@ const weatherMetrics = computed(() => [
               :key="idx"
               class="d-flex flex-column align-center"
             >
-              <Icon
+              <icon
                 :icon="metric.icon"
                 class="text-h4"
                 :data-testid="toKebabCase(`weather-metric-icon-${metric.label}`)"

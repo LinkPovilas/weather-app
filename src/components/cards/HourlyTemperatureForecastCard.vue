@@ -4,12 +4,8 @@ import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { computed } from 'vue';
 import { isSameHour } from '@/utils/timeUtils';
 import { useDate } from 'vuetify';
-import CircularProgressBar from '../CircularProgressBar.vue';
-import NoDataContentText from './NoDataContentText.vue';
-
-const weatherStore = useWeatherForecastStore();
-
-const date = useDate();
+import CircularProgressBar from '@/components/CircularProgressBar.vue';
+import NoDataContentText from '@/components/cards/NoDataContentText.vue';
 
 type ChartData = {
   index: number;
@@ -17,6 +13,9 @@ type ChartData = {
   precipitationProbability: number;
   time: string;
 };
+
+const weatherStore = useWeatherForecastStore();
+const date = useDate();
 
 const nowPoint = computed(() => {
   const currentTime = weatherStore.currentWeather?.time || new Date().toISOString();
@@ -49,7 +48,7 @@ const tickValues = computed(() => {
   return chartData.value.map((_, index) => index);
 });
 
-const tickFormat = (value: number): string => {
+const handleTickFormat = (value: number) => {
   const dataPoint = chartData.value?.[value];
 
   if (!dataPoint?.time) {
@@ -66,18 +65,14 @@ const tickFormat = (value: number): string => {
 const x = (d: ChartData) => d.index;
 const y = (d: ChartData) => d.temperature;
 
-const temperatureEveryTwoHours = (d: ChartData, i: number): string => {
+const handleTemperatureEveryTwoHours = (d: ChartData, i: number) => {
   return i % 2 === 0 ? `${d.temperature}°` : '';
 };
-
-const isHourlyForecastEmpty = computed(
-  () => !weatherStore.hourlyForecast || weatherStore.hourlyForecast.length === 0,
-);
 </script>
 
 <template>
   <v-card class="fill-height">
-    <CircularProgressBar v-if="weatherStore.loading" />
+    <circular-progress-bar v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Hourly Temperature Forecast</v-card-title>
@@ -92,8 +87,8 @@ const isHourlyForecastEmpty = computed(
         </defs>
       </svg>
 
-      <template v-if="isHourlyForecastEmpty">
-        <NoDataContentText />
+      <template v-if="weatherStore.hourlyForecast?.length === 0">
+        <no-data-content-text />
       </template>
 
       <template v-else>
@@ -101,33 +96,33 @@ const isHourlyForecastEmpty = computed(
           class="d-flex justify-center align-center fill-height"
           data-testid="hourly-temperature-forecast-chart"
         >
-          <VisXYContainer v-if="chartData.length" :data="chartData" :margin="{ bottom: 20 }">
-            <VisArea
-              curveType="basis"
+          <vis-XYContainer v-if="chartData.length" :data="chartData" :margin="{ bottom: 20 }">
+            <vis-area
+              curve-type="basis"
               :x="x"
               :y="y"
-              :minHeight="1"
+              :min-height="1"
               color="url(#temperatureGradient)"
             />
-            <VisScatter
+            <vis-scatter
               :x="x"
               :y="y"
               :size="8"
-              :label="temperatureEveryTwoHours"
+              :label="handleTemperatureEveryTwoHours"
               color="none"
-              labelColor="white"
-              labelPosition="top"
-              :labelFontSize="12"
+              label-color="white"
+              label-position="top"
+              :label-font-size="12"
             />
-            <VisAxis
+            <vis-axis
               type="x"
-              :tickLine="undefined"
-              :gridLine="false"
-              :tickFormat="tickFormat"
-              :tickValues="tickValues"
-              :tickTextColor="'white'"
+              :tick-line="undefined"
+              :grid-line="false"
+              :tick-format="handleTickFormat"
+              :tick-values="tickValues"
+              :tick-text-color="'white'"
             />
-          </VisXYContainer>
+          </vis-XYContainer>
         </v-card-text>
       </template>
     </template>
