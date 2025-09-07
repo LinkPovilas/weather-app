@@ -1,9 +1,5 @@
 <script setup lang="ts">
-type Props = {
-  message?: string;
-};
-
-withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<{ message?: string }>(), {
   message: 'Loading...',
 });
 </script>

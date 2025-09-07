@@ -6,7 +6,7 @@ const messageStore = useMessagesStore();
 
 <template>
   <v-snackbar-queue
-    v-model="messageStore.queue"
+    :value="messageStore.queue"
     location="top right"
     timer="white"
   ></v-snackbar-queue>

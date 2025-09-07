@@ -227,7 +227,7 @@ describe('HourlyTemperatureForecastCard', () => {
         piniaOptions: {
           initialState: {
             weatherForecast: {
-              hourlyForecast: null,
+              hourlyForecast: [],
               currentWeather,
             },
           },
@@ -242,7 +242,7 @@ describe('HourlyTemperatureForecastCard', () => {
         piniaOptions: {
           initialState: {
             weatherForecast: {
-              hourlyForecast: undefined,
+              hourlyForecast: [],
               currentWeather,
             },
           },

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { useDate } from 'vuetify';
-import LoadingSpinner from '../CircularProgressBar.vue';
-import NoDataContentText from './NoDataContentText.vue';
+import CircularProgressBar from '@/components/CircularProgressBar.vue';
+import NoDataContentText from '@/components/cards/NoDataContentText.vue';
 import dayjs from 'dayjs';
-import { computed } from 'vue';
+
+const TIME_RANGE = { midnight: 0, nextDay: 86400 };
 
 const weatherStore = useWeatherForecastStore();
 const date = useDate();
-
-const timeRange = { midnight: 0, nextDay: 86400 };
 
 const convertToSecondsFromMidnight = (dateTime: string) => {
   const time = dayjs(dateTime);
@@ -22,21 +21,17 @@ const formatDaylightDuration = (durationInSeconds: number) => {
   const minutes = Math.floor((durationInSeconds % 3600) / 60);
   return `${hours}h ${minutes}m`;
 };
-
-const isDailyForecastEmpty = computed(
-  () => !weatherStore.dailyForecast || weatherStore.dailyForecast.length === 0,
-);
 </script>
 
 <template>
   <v-card class="fill-height d-flex flex-column">
-    <LoadingSpinner v-if="weatherStore.loading" />
+    <circular-progress-bar v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Daily Sunrise & Sunset</v-card-title>
 
-      <template v-if="isDailyForecastEmpty">
-        <NoDataContentText />
+      <template v-if="weatherStore.dailyForecast?.length === 0">
+        <no-data-content-text />
       </template>
 
       <v-list v-else class="flex-grow-1 d-flex flex-column justify-space-around">
@@ -71,8 +66,8 @@ const isDailyForecastEmpty = computed(
                         convertToSecondsFromMidnight(daily.sunrise),
                         convertToSecondsFromMidnight(daily.sunset),
                       ]"
-                      :min="timeRange.midnight"
-                      :max="timeRange.nextDay"
+                      :min="TIME_RANGE.midnight"
+                      :max="TIME_RANGE.nextDay"
                       :step="60"
                       :track-color="'grey-darken-3'"
                       data-testid="daily-daylight-duration-range"

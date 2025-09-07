@@ -2,29 +2,23 @@
 import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 import { Icon } from '@iconify/vue';
 import { useDate } from 'vuetify';
-import LoadingSpinner from '../CircularProgressBar.vue';
+import CircularProgressBar from '@/components/CircularProgressBar.vue';
 import { getWeatherDescription, getWeatherIcon } from '@/utils/weatherUtils';
-import NoDataContentText from './NoDataContentText.vue';
-import { computed } from 'vue';
+import NoDataContentText from '@/components/cards/NoDataContentText.vue';
 
 const weatherStore = useWeatherForecastStore();
-
 const date = useDate();
-
-const isDailyForecastEmpty = computed(
-  () => !weatherStore.dailyForecast || weatherStore.dailyForecast.length === 0,
-);
 </script>
 
 <template>
   <v-card class="fill-height">
-    <LoadingSpinner v-if="weatherStore.loading" />
+    <circular-progress-bar v-if="weatherStore.loading" />
 
     <template v-else>
       <v-card-title>Daily Forecast</v-card-title>
 
-      <template v-if="isDailyForecastEmpty">
-        <NoDataContentText />
+      <template v-if="weatherStore.dailyForecast?.length === 0">
+        <no-data-content-text />
       </template>
 
       <v-list v-else bg-color="transparent" data-testid="daily-forecast-list">
@@ -47,7 +41,7 @@ const isDailyForecastEmpty = computed(
                 >
                   <template v-slot:activator="{ props }">
                     <div v-bind="props" class="d-inline-block">
-                      <Icon
+                      <icon
                         :icon="getWeatherIcon(daily.weatherCode)"
                         class="text-h3"
                         data-testid="daily-forecast-icon"
