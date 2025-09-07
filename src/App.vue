@@ -31,7 +31,7 @@ onMounted(async () => {
 <template>
   <v-app>
     <v-main class="pa-4">
-      <app-toast></app-toast>
+      <app-toast/>
       <v-container fluid>
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="4" xl="4">

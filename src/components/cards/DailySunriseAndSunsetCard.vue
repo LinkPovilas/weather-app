@@ -5,7 +5,7 @@ import CircularProgressBar from '@/components/CircularProgressBar.vue';
 import NoDataContentText from '@/components/cards/NoDataContentText.vue';
 import dayjs from 'dayjs';
 
-const TIME_RANGE = { midnight: 0, nextDay: 86400 };
+const TIME_RANGE = { MIDNIGHT: 0, NEXT_DAY: 86400 };
 
 const weatherStore = useWeatherForecastStore();
 const date = useDate();
@@ -66,8 +66,8 @@ const formatDaylightDuration = (durationInSeconds: number) => {
                         convertToSecondsFromMidnight(daily.sunrise),
                         convertToSecondsFromMidnight(daily.sunset),
                       ]"
-                      :min="TIME_RANGE.midnight"
-                      :max="TIME_RANGE.nextDay"
+                      :min="TIME_RANGE.MIDNIGHT"
+                      :max="TIME_RANGE.NEXT_DAY"
                       :step="60"
                       :track-color="'grey-darken-3'"
                       data-testid="daily-daylight-duration-range"
