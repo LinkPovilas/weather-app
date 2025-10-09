@@ -64,10 +64,6 @@ const handleTickFormat = (value: number) => {
 
 const x = (d: ChartData) => d.index;
 const y = (d: ChartData) => d.temperature;
-
-const handleTemperatureEveryTwoHours = (d: ChartData, i: number) => {
-  return i % 2 === 0 ? `${d.temperature}°` : '';
-};
 </script>
 
 <template>
@@ -108,7 +104,7 @@ const handleTemperatureEveryTwoHours = (d: ChartData, i: number) => {
               :x="x"
               :y="y"
               :size="8"
-              :label="handleTemperatureEveryTwoHours"
+              :label="(d: ChartData, i: number) => (i % 2 === 0 ? `${d.temperature}°` : '')"
               color="none"
               label-color="white"
               label-position="top"

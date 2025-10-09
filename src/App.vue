@@ -6,22 +6,10 @@ import HourlyTemperatureForecast from '@/components/cards/HourlyTemperatureForec
 import MapCard from '@/components/cards/MapCard.vue';
 import DailySunriseAndSunsetCard from '@/components/cards/DailySunriseAndSunsetCard.vue';
 import AppToast from '@/components/AppToast.vue';
-import { onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 import { useGeolocationStore } from '@/stores/useGeolocationStore';
-import { useWeatherForecastStore } from '@/stores/useWeatherForecastStore';
 
 const geolocationStore = useGeolocationStore();
-const weatherStore = useWeatherForecastStore();
-
-watch(
-  () => geolocationStore.location,
-  (newLocation) => {
-    if (newLocation.latitude && newLocation.longitude) {
-      weatherStore.fetchWeather(newLocation.latitude, newLocation.longitude);
-    }
-  },
-  { immediate: true, deep: true },
-);
 
 onMounted(async () => {
   await geolocationStore.fetchGeneralLocation();
@@ -31,7 +19,7 @@ onMounted(async () => {
 <template>
   <v-app>
     <v-main class="pa-4">
-      <app-toast/>
+      <app-toast />
       <v-container fluid>
         <v-row justify="center">
           <v-col cols="12" sm="10" md="8" lg="4" xl="4">
