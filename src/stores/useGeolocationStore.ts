@@ -6,6 +6,7 @@ import {
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useMessagesStore } from './useMessagesStore';
+import { useWeatherForecastStore } from './useWeatherForecastStore';
 import { useGeolocation, usePermission } from '@vueuse/core';
 
 type Location = {
@@ -19,6 +20,7 @@ export const useGeolocationStore = defineStore('geolocation', () => {
   const location = ref<Location>({ latitude: null, longitude: null, name: null });
 
   const messagesStore = useMessagesStore();
+  const weatherStore = useWeatherForecastStore();
 
   const geolocationPermission = usePermission('geolocation');
 
@@ -37,6 +39,7 @@ export const useGeolocationStore = defineStore('geolocation', () => {
     location.value.latitude = latitude;
     location.value.longitude = longitude;
     location.value.name = name;
+    weatherStore.fetchWeather(latitude, longitude);
   };
 
   const fetchGeneralLocation = async () => {
